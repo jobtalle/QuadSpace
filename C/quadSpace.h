@@ -25,4 +25,4 @@ void quadSpaceFree(struct quadSpace *quad);
 
 quadSpacePosition quadSpaceQuery(struct quadSpace *quad, uint8_t scale);
 void quadSpaceRelease(struct quadSpace *quad, quadSpacePosition position);
-uint8_t quadSpaceLevel(struct quadSpace *quad, quadSpacePosition position);
+uint8_t quadSpaceLevel(quadSpacePosition position);
