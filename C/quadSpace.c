@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 void quadSpaceInitialize(struct quadSpace *quad)
 {
@@ -54,18 +55,6 @@ static void quadSpaceValidateParent(struct quadSpace *quad, uint32_t child, uint
 	}
 }
 
-static uint8_t quadSpaceScaleFromPosition(struct quadSpace *quad, quadSpacePosition position)
-{
-	uint32_t index = QUAD_SPACE_NODE_COUNT - POW_4(7);
-	uint8_t scale = 7;
-
-	while(position.node < index) {
-		index -= POW_4(--scale);
-	}
-
-	return scale;
-}
-
 quadSpacePosition quadSpaceQuery(struct quadSpace *quad, uint8_t scale)
 {
 	quadSpacePosition position;
@@ -108,20 +97,13 @@ quadSpacePosition quadSpaceQuery(struct quadSpace *quad, uint8_t scale)
 
 void quadSpaceRelease(struct quadSpace *quad, quadSpacePosition position)
 {
-	uint8_t scale = quadSpaceScaleFromPosition(quad, position);
+	uint8_t level = quadSpaceLevel(position);
 
 	quad->nodes[position.node] = 0xFF;
-	if(scale != 0) quadSpaceValidateParent(quad, position.node, scale);
+	if(level != 0) quadSpaceValidateParent(quad, position.node, level);
 }
 
-uint8_t quadSpaceLevel(struct quadSpace *quad, quadSpacePosition position)
+uint8_t quadSpaceLevel(quadSpacePosition position)
 {
-	uint32_t index = QUAD_SPACE_NODE_COUNT - POW_4(7);
-	uint8_t scale = 7;
-
-	while(position.node < index) {
-		index -= POW_4(--scale);
-	}
-
-	return scale;
+	return uint8_t(log(3 * (position.node + 1) + 1) / log(4) - 1);
 }
